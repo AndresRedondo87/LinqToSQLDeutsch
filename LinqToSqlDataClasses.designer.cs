@@ -36,6 +36,12 @@ namespace LinqToSQLDeutsch
     partial void InsertStudent(Student instance);
     partial void UpdateStudent(Student instance);
     partial void DeleteStudent(Student instance);
+    partial void InsertStudentLecture(StudentLecture instance);
+    partial void UpdateStudentLecture(StudentLecture instance);
+    partial void DeleteStudentLecture(StudentLecture instance);
+    partial void InsertLecture(Lecture instance);
+    partial void UpdateLecture(Lecture instance);
+    partial void DeleteLecture(Lecture instance);
     #endregion
 		
 		public LinqToSqlDataClassesDataContext() : 
@@ -81,6 +87,22 @@ namespace LinqToSQLDeutsch
 			get
 			{
 				return this.GetTable<Student>();
+			}
+		}
+		
+		public System.Data.Linq.Table<StudentLecture> StudentLecture
+		{
+			get
+			{
+				return this.GetTable<StudentLecture>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Lecture> Lecture
+		{
+			get
+			{
+				return this.GetTable<Lecture>();
 			}
 		}
 	}
@@ -213,6 +235,8 @@ namespace LinqToSQLDeutsch
 		
 		private System.Nullable<int> _UniversityId;
 		
+		private EntitySet<StudentLecture> _StudentLecture;
+		
 		private EntityRef<University> _University;
 		
     #region Definitionen der Erweiterungsmethoden
@@ -231,6 +255,7 @@ namespace LinqToSQLDeutsch
 		
 		public Student()
 		{
+			this._StudentLecture = new EntitySet<StudentLecture>(new Action<StudentLecture>(this.attach_StudentLecture), new Action<StudentLecture>(this.detach_StudentLecture));
 			this._University = default(EntityRef<University>);
 			OnCreated();
 		}
@@ -319,6 +344,19 @@ namespace LinqToSQLDeutsch
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Student_StudentLecture", Storage="_StudentLecture", ThisKey="Id", OtherKey="StudentId")]
+		public EntitySet<StudentLecture> StudentLecture
+		{
+			get
+			{
+				return this._StudentLecture;
+			}
+			set
+			{
+				this._StudentLecture.Assign(value);
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="University_Student", Storage="_University", ThisKey="UniversityId", OtherKey="Id", IsForeignKey=true, DeleteRule="CASCADE")]
 		public University University
 		{
@@ -371,6 +409,324 @@ namespace LinqToSQLDeutsch
 			{
 				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 			}
+		}
+		
+		private void attach_StudentLecture(StudentLecture entity)
+		{
+			this.SendPropertyChanging();
+			entity.Student = this;
+		}
+		
+		private void detach_StudentLecture(StudentLecture entity)
+		{
+			this.SendPropertyChanging();
+			entity.Student = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.StudentLecture")]
+	public partial class StudentLecture : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private int _StudentId;
+		
+		private int _LectureId;
+		
+		private EntityRef<Student> _Student;
+		
+		private EntityRef<Lecture> _Lecture;
+		
+    #region Definitionen der Erweiterungsmethoden
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnStudentIdChanging(int value);
+    partial void OnStudentIdChanged();
+    partial void OnLectureIdChanging(int value);
+    partial void OnLectureIdChanged();
+    #endregion
+		
+		public StudentLecture()
+		{
+			this._Student = default(EntityRef<Student>);
+			this._Lecture = default(EntityRef<Lecture>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_StudentId", DbType="Int NOT NULL")]
+		public int StudentId
+		{
+			get
+			{
+				return this._StudentId;
+			}
+			set
+			{
+				if ((this._StudentId != value))
+				{
+					if (this._Student.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnStudentIdChanging(value);
+					this.SendPropertyChanging();
+					this._StudentId = value;
+					this.SendPropertyChanged("StudentId");
+					this.OnStudentIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LectureId", DbType="Int NOT NULL")]
+		public int LectureId
+		{
+			get
+			{
+				return this._LectureId;
+			}
+			set
+			{
+				if ((this._LectureId != value))
+				{
+					if (this._Lecture.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnLectureIdChanging(value);
+					this.SendPropertyChanging();
+					this._LectureId = value;
+					this.SendPropertyChanged("LectureId");
+					this.OnLectureIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Student_StudentLecture", Storage="_Student", ThisKey="StudentId", OtherKey="Id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		public Student Student
+		{
+			get
+			{
+				return this._Student.Entity;
+			}
+			set
+			{
+				Student previousValue = this._Student.Entity;
+				if (((previousValue != value) 
+							|| (this._Student.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Student.Entity = null;
+						previousValue.StudentLecture.Remove(this);
+					}
+					this._Student.Entity = value;
+					if ((value != null))
+					{
+						value.StudentLecture.Add(this);
+						this._StudentId = value.Id;
+					}
+					else
+					{
+						this._StudentId = default(int);
+					}
+					this.SendPropertyChanged("Student");
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Lecture_StudentLecture", Storage="_Lecture", ThisKey="LectureId", OtherKey="Id", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		public Lecture Lecture
+		{
+			get
+			{
+				return this._Lecture.Entity;
+			}
+			set
+			{
+				Lecture previousValue = this._Lecture.Entity;
+				if (((previousValue != value) 
+							|| (this._Lecture.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Lecture.Entity = null;
+						previousValue.StudentLecture.Remove(this);
+					}
+					this._Lecture.Entity = value;
+					if ((value != null))
+					{
+						value.StudentLecture.Add(this);
+						this._LectureId = value.Id;
+					}
+					else
+					{
+						this._LectureId = default(int);
+					}
+					this.SendPropertyChanged("Lecture");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Lecture")]
+	public partial class Lecture : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private string _Name;
+		
+		private EntitySet<StudentLecture> _StudentLecture;
+		
+    #region Definitionen der Erweiterungsmethoden
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnNameChanging(string value);
+    partial void OnNameChanged();
+    #endregion
+		
+		public Lecture()
+		{
+			this._StudentLecture = new EntitySet<StudentLecture>(new Action<StudentLecture>(this.attach_StudentLecture), new Action<StudentLecture>(this.detach_StudentLecture));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Name", DbType="NVarChar(50) NOT NULL", CanBeNull=false)]
+		public string Name
+		{
+			get
+			{
+				return this._Name;
+			}
+			set
+			{
+				if ((this._Name != value))
+				{
+					this.OnNameChanging(value);
+					this.SendPropertyChanging();
+					this._Name = value;
+					this.SendPropertyChanged("Name");
+					this.OnNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Lecture_StudentLecture", Storage="_StudentLecture", ThisKey="Id", OtherKey="LectureId")]
+		public EntitySet<StudentLecture> StudentLecture
+		{
+			get
+			{
+				return this._StudentLecture;
+			}
+			set
+			{
+				this._StudentLecture.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_StudentLecture(StudentLecture entity)
+		{
+			this.SendPropertyChanging();
+			entity.Lecture = this;
+		}
+		
+		private void detach_StudentLecture(StudentLecture entity)
+		{
+			this.SendPropertyChanging();
+			entity.Lecture = null;
 		}
 	}
 }

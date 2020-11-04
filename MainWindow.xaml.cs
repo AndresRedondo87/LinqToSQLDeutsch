@@ -35,9 +35,13 @@ namespace LinqToSQLDeutsch
             /// string sqlConnection = Properties.Settings.Default.NameDesConnectionStrings;
             dataContext = new LinqToSqlDataClassesDataContext(connectionString);
 
-            //mit Unis füllen
+            ////mit Unis füllen
             insertUniversities();
             insertStudents();
+            insertLectures();
+            insertStudenLectureAssociations();
+            GetUniversityOfJoseluisete();       //zeigt die Uni Name von Joseluisete
+            GetLectureOfJoseluisete();
         }
 
 
@@ -116,5 +120,89 @@ namespace LinqToSQLDeutsch
             ////MainDataGrid.ItemsSource = dataContext.Student;  // die Data im Grid wird von Universities geholt (erstmal ganz unformatiert.
         }
 
+
+        //Herausforderung Insertlectures selber hinzukriegen
+        public void insertLectures()
+        {
+            dataContext.ExecuteCommand("DELETE FROM Lecture");
+
+            Lecture mathe = new Lecture();
+            mathe.Name = "Mathematik";
+            dataContext.Lecture.InsertOnSubmit(mathe);
+
+            Lecture geschichte = new Lecture();
+            geschichte.Name = "Geschichte";
+            dataContext.Lecture.InsertOnSubmit(geschichte);
+
+            //LEHRER SCHNELLERE VERSION, anstatt die 3 Linie alles zusammen:
+            dataContext.Lecture.InsertOnSubmit(new Lecture { Name="Fisik"});
+
+
+            dataContext.SubmitChanges();                    //update the changes to the DB
+            MainDataGrid.ItemsSource = dataContext.Lecture;
+            // das klappt aber die anzeige ist einfach doof, zumindest erstmals.
+        }
+
+        //WEITERMACHEN Verbindungen!!!
+        public void insertStudenLectureAssociations()
+        {
+            //erst die Studenten Holen
+            Student carla = dataContext.Student.First(st => st.Name.Equals("Carla"));
+            Student pedro = dataContext.Student.First(st => st.Name.Equals("Pedro"));
+            Student xing = dataContext.Student.First(st => st.Name.Equals("Xing Mi Huang"));
+            Student joseluisete = dataContext.Student.First(st => st.Name.Equals("Jose Luisete"));
+
+            //dann die Fächer
+            Lecture mathe = dataContext.Lecture.First(Lecture => Lecture.Name.Equals("Mathematik"));
+            Lecture geschichte = dataContext.Lecture.First(Lecture => Lecture.Name.Equals("Geschichte"));
+            Lecture fisik = dataContext.Lecture.First(Lecture => Lecture.Name.Equals("Fisik"));
+
+
+            //wir schreiben die studenten-Leture Verbindungen!!
+            //LEHRER SCHNELLERE VERSION, anstatt die 3 Linie alles zusammen:
+            dataContext.StudentLecture.InsertOnSubmit(new StudentLecture { Student = carla, Lecture = mathe });
+            dataContext.StudentLecture.InsertOnSubmit(new StudentLecture { Student = pedro, Lecture = mathe });
+
+            // Längere Version auch von Lehrer
+            StudentLecture slXing = new StudentLecture();
+            slXing.StudentId = xing.Id;
+            slXing.LectureId = geschichte.Id;
+            dataContext.StudentLecture.InsertOnSubmit(slXing);
+
+
+            dataContext.StudentLecture.InsertOnSubmit(new StudentLecture { Student = joseluisete, Lecture = fisik });
+            dataContext.StudentLecture.InsertOnSubmit(new StudentLecture { Student = joseluisete, Lecture = geschichte });
+            dataContext.StudentLecture.InsertOnSubmit(new StudentLecture { Student = joseluisete, Lecture = mathe });
+
+            dataContext.SubmitChanges();    //update the changes to the DB
+            MainDataGrid.ItemsSource = dataContext.StudentLecture;
+
+            // Student und Lecture werden auch fälschlich angezeigt da wir das ganze Objekt übergeben... das ist nicht so ganz ok
+
+        }
+
+        public void GetUniversityOfJoseluisete()
+        {
+            Student joseluisete = dataContext.Student.First(st => st.Name.Equals("Jose Luisete"));
+            University joseluisetesUni = joseluisete.University;
+
+            // wir dürfen nicht eine  uni zur MainDataGrid.ItemsSource übergeben, da es  eine IEnumerable erwartet.
+            // deswegen bauen wir hier einfach eine liste mit diese uni...
+            List<University> universities = new List<University>();
+            universities.Add(joseluisetesUni);
+
+            MainDataGrid.ItemsSource = universities;
+        }
+
+        //Herausforderung, hol die Lecture von Tony
+        public void GetLectureOfJoseluisete()
+        {
+            Student joseluisete = dataContext.Student.First(st => st.Name.Equals("Jose Luisete"));
+            var joseluisetesLectures = from sl in joseluisete.StudentLecture select sl.Lecture;
+            // wir holen alle fächer die in Joseluisete zu finden sind!! so zu sagen wir suchen von  joseluisete seite alle einträge in StudentLecture.
+            // natürlich geht es so , es war aber nicht erklärt das es wieder mit From select 
+
+            MainDataGrid.ItemsSource = joseluisetesLectures;
+        }
     }
 }
