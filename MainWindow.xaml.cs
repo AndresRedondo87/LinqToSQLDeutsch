@@ -38,11 +38,13 @@ namespace LinqToSQLDeutsch
             ////mit Unis füllen
             insertUniversities();
             insertStudents();
-            insertLectures();
-            insertStudenLectureAssociations();
-            GetUniversityOfJoseluisete();       //zeigt die Uni Name von Joseluisete
-            GetLectureOfJoseluisete();
-            GetAllLecturesFromBeijingTech();
+            //insertLectures();
+            //insertStudenLectureAssociations();
+            //GetUniversityOfJoseluisete();       //zeigt die Uni Name von Joseluisete
+            //GetLectureOfJoseluisete();
+            //GetAllLecturesFromBeijingTech();
+            UpdateCarla();
+            DeleteJames();
         }
 
 
@@ -96,6 +98,7 @@ namespace LinqToSQLDeutsch
             students.Add(new Student { Name = "Pedro", Gender = "male", UniversityId = madrid.Id });
             students.Add(new Student { Name = "Xing Mi Huang", Gender = "female", UniversityId = beijingTech.Id });
             students.Add(new Student { Name = "Jose Luisete", Gender = "male", UniversityId = beijingTech.Id });
+            students.Add(new Student { Name = "James", Gender = "male", UniversityId = beijingTech.Id });
 
             // die Liste in die Tabelle ubertragen
 
@@ -152,6 +155,7 @@ namespace LinqToSQLDeutsch
             Student pedro = dataContext.Student.First(st => st.Name.Equals("Pedro"));
             Student xing = dataContext.Student.First(st => st.Name.Equals("Xing Mi Huang"));
             Student joseluisete = dataContext.Student.First(st => st.Name.Equals("Jose Luisete"));
+            Student james = dataContext.Student.First(st => st.Name.Equals("James"));       //gebraucht um die ganzen verbindungen zu haben!!
 
             //dann die Fächer
             Lecture mathe = dataContext.Lecture.First(Lecture => Lecture.Name.Equals("Mathematik"));
@@ -224,6 +228,27 @@ namespace LinqToSQLDeutsch
             LecturesFromBeijingTech = LecturesFromBeijingTech.Distinct();
 
             MainDataGrid.ItemsSource = LecturesFromBeijingTech;
+        }
+
+        //Löschen und aktualisieren..... letzter video ENDLICH
+        public void UpdateCarla()
+        {
+            Student carla = dataContext.Student.FirstOrDefault(st => st.Name.Equals("Carla"));
+            carla.Name = "Carlota María del Rosario";
+            dataContext.SubmitChanges();
+            MainDataGrid.ItemsSource = dataContext.Student;
+        }
+
+        public  void DeleteJames()
+        {
+            Student james = dataContext.Student.FirstOrDefault(st => st.Name.Equals("James"));
+            dataContext.Student.DeleteOnSubmit(james);
+            
+            // ES WIRD TATSÄCHLICH GELÖSCHT, ABERR BEI MIR IRGENDWIE IMMER NOCH ANGEZEIGT KEIN PLAN WIESO UND IST MIR ENDLICH EGAL!
+            // SCHLUSS DAMIT!
+            dataContext.SubmitChanges();
+            MainDataGrid.ItemsSource = dataContext.Student;
+
         }
     }
 }
