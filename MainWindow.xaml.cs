@@ -42,6 +42,7 @@ namespace LinqToSQLDeutsch
             insertStudenLectureAssociations();
             GetUniversityOfJoseluisete();       //zeigt die Uni Name von Joseluisete
             GetLectureOfJoseluisete();
+            GetAllLecturesFromBeijingTech();
         }
 
 
@@ -94,7 +95,7 @@ namespace LinqToSQLDeutsch
             students.Add(new Student { Name = "Carla", Gender = "female", UniversityId = yale.Id });
             students.Add(new Student { Name = "Pedro", Gender = "male", UniversityId = madrid.Id });
             students.Add(new Student { Name = "Xing Mi Huang", Gender = "female", UniversityId = beijingTech.Id });
-            students.Add(new Student { Name = "Jose Luisete", Gender = "male", UniversityId = valladolid.Id });
+            students.Add(new Student { Name = "Jose Luisete", Gender = "male", UniversityId = beijingTech.Id });
 
             // die Liste in die Tabelle ubertragen
 
@@ -203,6 +204,26 @@ namespace LinqToSQLDeutsch
             // natürlich geht es so , es war aber nicht erklärt das es wieder mit From select 
 
             MainDataGrid.ItemsSource = joseluisetesLectures;
+        }
+
+
+        /// Verbindung zwischen Uni und alle seine fächer Lectures da
+        /// in StudentLecture, verbunden mit Student tabelle vial studenten+Ids
+        /// und dann dort welche sind aus diese uni. dann daraus die Fächer Lectures auswählen...
+        ///  SUPER EINFACH ALLES WAS SOLL DAS HIER!!!!!!!!!!!!!!
+        public void GetAllLecturesFromBeijingTech()
+        {
+            var LecturesFromBeijingTech = from sl in dataContext.StudentLecture
+                                          join student in dataContext.Student on sl.StudentId equals student.Id
+                                          where student.University.Name == "Beijing Tech"
+                                          select sl.Lecture;
+            // Visualstudio ist schlau genug und brauch nicht die zwischenspets von UniversityId und LectureIds...
+            //es klappt aber die verdoppelten einträge werden doch wiederholt gezeigt.werden ...
+
+            //SELBER UPDATE die Liste um doppelten zu entfernen :)
+            LecturesFromBeijingTech = LecturesFromBeijingTech.Distinct();
+
+            MainDataGrid.ItemsSource = LecturesFromBeijingTech;
         }
     }
 }
